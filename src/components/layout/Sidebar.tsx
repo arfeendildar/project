@@ -6,7 +6,6 @@ import {
   FileVideo, 
   ClipboardList,
   Calendar,
-  Bot,
   Award,
   Settings
 } from 'lucide-react';
@@ -20,7 +19,6 @@ const Sidebar = () => {
     { icon: FileVideo, label: 'Lectures', path: '/lectures' },
     { icon: ClipboardList, label: 'Assignments', path: '/assignments' },
     { icon: Calendar, label: 'Calendar', path: '/calendar' },
-    { icon: Bot, label: 'AI Tutor', path: '/ai-tutor' },
     { icon: Award, label: 'Certifications', path: '/certifications' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
