@@ -3,7 +3,7 @@ import { Plus, Filter, Search } from 'lucide-react';
 import CourseCard from '../components/courses/CourseCard';
 import { Course } from '../types';
 
-const mockCourses: Course[] = [
+const initialCourses: Course[] = [
   {
     id: '1',
     title: 'Introduction to Web Development',
@@ -39,25 +39,112 @@ const mockCourses: Course[] = [
 const categories = ['All', 'Development', 'Data Science', 'Design', 'Business', 'Marketing'];
 
 const Courses = () => {
+  const [courses, setCourses] = useState(initialCourses);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [newCourse, setNewCourse] = useState<Course>({
+    id: '',
+    title: '',
+    description: '',
+    category: categories[1],
+    thumbnail: '',
+    totalStudents: 0,
+    totalLectures: 0,
+    progress: 0,
+  });
 
-  const filteredCourses = mockCourses.filter(course => {
+  const filteredCourses = courses.filter(course => {
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory;
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const handleAddCourse = () => {
+    if (!newCourse.title || !newCourse.description) {
+      alert('Please provide valid course details.');
+      return;
+    }
+    setCourses([...courses, { ...newCourse, id: `${Date.now()}` }]);
+    setShowModal(false);
+    setNewCourse({
+      id: '',
+      title: '',
+      description: '',
+      category: categories[1],
+      thumbnail: '',
+      totalStudents: 0,
+      totalLectures: 0,
+      progress: 0,
+    });
+  };
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Courses</h1>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <button
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          onClick={() => setShowModal(true)}
+        >
           <Plus className="h-5 w-5" />
           Create Course
         </button>
       </div>
+
+      {/* Add Course Modal */}
+      {showModal && (
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-30 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative z-60">
+      <h2 className="text-lg font-semibold mb-4">Create New Course</h2>
+      <div className="mb-4">
+        <label className="block mb-1 text-sm font-medium">Title</label>
+        <input
+          type="text"
+          value={newCourse.title}
+          onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+      </div>
+      <div className="mb-4">
+        <label className="block mb-1 text-sm font-medium">Description</label>
+        <textarea
+          value={newCourse.description}
+          onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+          className="w-full px-3 py-2 border rounded-lg"
+        ></textarea>
+      </div>
+      <div className="mb-4">
+        <label className="block mb-1 text-sm font-medium">Category</label>
+        <select
+          value={newCourse.category}
+          onChange={(e) => setNewCourse({ ...newCourse, category: e.target.value })}
+          className="w-full px-3 py-2 border rounded-lg"
+        >
+          {categories.slice(1).map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex justify-end gap-2">
+        <button
+          className="px-4 py-2 text-sm bg-gray-200 rounded-lg"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </button>
+        <button className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg" onClick={handleAddCourse}>
+          Add Course
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <div className="relative flex-1">
@@ -77,15 +164,17 @@ const Courses = () => {
             onChange={(e) => setSelectedCategory(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
           >
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCourses.map(course => (
+        {filteredCourses.map((course) => (
           <CourseCard key={course.id} course={course} />
         ))}
       </div>
